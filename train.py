@@ -5,7 +5,7 @@ from tqdm import tqdm
 import pdb
 
 from utils import setup_seed
-from dataset import Kitti, get_dataloader
+from dataset import Kitti, CustomDataloader, get_dataloader
 from model import PointPillars
 from loss import Loss
 from torch.utils.tensorboard import SummaryWriter
@@ -22,10 +22,9 @@ def save_summary(writer, loss_dict, global_step, tag, lr=None, momentum=None):
 
 def main(args):
     setup_seed()
-    train_dataset = Kitti(data_root=args.data_root,
-                          split='train')
-    val_dataset = Kitti(data_root=args.data_root,
-                        split='val')
+    train_dataset = CustomDataloader(data_root=args.data_root)
+    val_dataset = CustomDataloader(data_root=args.data_root)
+
     train_dataloader = get_dataloader(dataset=train_dataset, 
                                       batch_size=args.batch_size, 
                                       num_workers=args.num_workers,

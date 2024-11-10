@@ -32,6 +32,49 @@ class BaseSampler():
                 np.random.shuffle(self.indices)
         return ret
 
+"""
+<DATA ROOT>
+    training_data - .npz
+    annotations - .txt 
+"""
+class CustomDataloader(Dataset):
+    CLASSES = {
+        'CONE': 1
+    }
+    def __init__(self, data_root):
+        self.data_root = data_root
+        self.train_dir = os.path.join(self.data_root, 'training_data')
+        self.annotations_dir = os.path.join(self.data_root, 'annotations')
+
+        self.num_instances = 0
+        for entry in os.scandir(self.train_dir):
+            if entry.is_file():
+                self.num_instances += 1
+    
+    def __getitem__(self, index):
+        pts = np.load(os.path.join(self.train_dir, f'instance-{index}.npz'))['points']
+        gt_bboxes = []
+        with open(os.path.join(self.annotations_dir, f'instance-{index}.txt')) as file:
+            lines = file.readlines()
+            for line in lines:
+                tokens = line.split(" ")  
+                gt_bboxes.append(tokens[8:])
+        gt_bboxes_3d = np.array(gt_bboxes)
+        gt_labels = ['Cone' for _ in range(len(gt_bboxes))]
+        data_dict = {
+            'pts': pts,
+            'gt_bboxes_3d': gt_bboxes_3d,
+            'gt_labels': gt_labels, 
+            'gt_names': np.empty((69, 69)),
+            'difficulty': np.empty((69, 69)),
+            'image_info': np.empty((69, 69)),
+            'calib_info': np.empty((69, 69))
+        }
+        return data_dict
+
+
+    def __len__(self):
+        return self.num_instances
 
 class Kitti(Dataset):
 
