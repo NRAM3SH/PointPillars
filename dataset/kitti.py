@@ -157,8 +157,8 @@ class Kitti(Dataset):
         annos_location = annos_info['location']
         annos_dimension = annos_info['dimensions']
         rotation_y = annos_info['rotation_y']
-        gt_bboxes = np.concatenate([annos_location, annos_dimension, rotation_y[:, None]], axis=1).astype(np.float32)
-        gt_bboxes_3d = bbox_camera2lidar(gt_bboxes, tr_velo_to_cam, r0_rect)
+        gt_bboxes_3d = np.concatenate([annos_location, annos_dimension, rotation_y[:, None]], axis=1).astype(np.float32)
+        # gt_bboxes_3d = bbox_camera2lidar(gt_bboxes, tr_velo_to_cam, r0_rect)
         gt_labels = [self.CLASSES.get(name, -1) for name in annos_name]
         data_dict = {
             'pts': pts,
